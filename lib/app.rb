@@ -44,8 +44,15 @@ class HangpersonApp < Sinatra::Base
       flash[:message] = """Invalid guess."
       redirect '/show'
     end
+    
+    charset="abcdefghijklmnopqrstuvwxyz"
+    if charset.index(let.downcase) == nil 
+      flash[:message] = """Invalid guess."
+      redirect '/show'
+    end
+    
     if @game.guess(letter)==false
-      flash[:message]="You have already used that letter"
+      flash[:message]="You have already used that letter."
       redirect '/show'
     end
     
