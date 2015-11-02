@@ -46,7 +46,7 @@ class HangpersonApp < Sinatra::Base
     end
     
     charset="abcdefghijklmnopqrstuvwxyz"
-    if charset.index(let.downcase) == nil 
+    if charset.index(letter.downcase) == nil 
       flash[:message] = """Invalid guess."
       redirect '/show'
     end
