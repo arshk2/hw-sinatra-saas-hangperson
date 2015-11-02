@@ -81,5 +81,5 @@ end
 
 
 def guess_several_letters(game_class,str)
-  str.each{|x| game_class.guess(x)}
+  str.each_char{|x| game_class.guess(x)}
 end

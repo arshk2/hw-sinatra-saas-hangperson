@@ -8,13 +8,15 @@ class HangpersonApp < Sinatra::Base
   register Sinatra::Flash
   
   before do
-    # code that is called before EVERY HTTP request
+    @game = session[:game] || HangpersonGame.new('')
   end
   
   after do
-    # code that is called after EVERY HTTP request
+    session[:game] = @game
   end
   
+  # These two routes are good examples of Sinatra syntax
+  # to help you with the rest of the assignment
   get '/' do
     redirect '/new'
   end
@@ -24,50 +26,56 @@ class HangpersonApp < Sinatra::Base
   end
   
   post '/create' do
-    # Don't change next line: it's necessary for autograder to work properly.
-    word = params[:word] || HangpersonGame.get_random_word # don't change this line!
-    # Don't change the above line: it's necessary for autograder to work properly.
-    # Your additional code goes here:
+    # NOTE: don't change next line - it's needed by autograder!
+    word = params[:word] || HangpersonGame.get_random_word
+    # NOTE: don't change previous line - it's needed by autograder!
 
+    @game = HangpersonGame.new(word)
+    redirect '/show'
   end
   
+  # Use existing methods in HangpersonGame to process a guess.
+  # If a guess is repeated, set flash[:message] to "You have already used that letter."
+  # If a guess is invalid, set flash[:message] to "Invalid guess."
   post '/guess' do
-    # get the guessed letter from params[:guess] (note: if user left it blank,
-    #   params[:guess] will be nil)
-
-    # Try guessing the letter.  If it has already been guessed,
-    #   display "You have already used that letter."
-
-    # Either way, the user should then be shown the main game screen ('show' action).
-
+    letter = params[:guess].to_s[0]
+    
+    if letter==nil or letter==""
+      flash[:message] = """Invalid guess."
+      redirect '/show'
+    end
+    if @game.guess(letter)==false
+      flash[:message]="You have already used that letter"
+      redirect '/show'
+    end
+    
+    
+    if @game.check_win_or_lose==:win
+      redirect '/win'
+    elsif @game.check_win_or_lose==:lose 
+      redirect '/lose'
+    end
+    redirect '/show'
   end
   
+  # Everytime a guess is made, we should eventually end up at this route.
+  # Use existing methods in HangpersonGame to check if player has
+  # won, lost, or neither, and take the appropriate action.
+  # Notice that the show.erb template expects to use the instance variables
+  # wrong_guesses and word_with_guesses from @game.
   get '/show' do
-    # To show the game status, use the check_win_or_lose function.
-    # If player wins (word completed), do the 'win' action instead.
-    # If player loses (all guesses used), do the 'lose' action instead.
-    # Otherwise, show the contents of the 'show.erb' (main game view) template.
-
+    ### YOUR CODE HERE ###
+    erb :show # You may change/remove this line
   end
   
   get '/win' do
-    # Player wins. WARNING: prevent cheating by making sure the game has really been won!
-    #  If player tries to cheat, they should be shown the main game view instead.  (And
-    #  you can optionally supply a "No cheating!" messaage.)
-    # If they really did win, show the 'win' view template.
-    
+    ### YOUR CODE HERE ###
+    erb :win # You may change/remove this line
   end
   
   get '/lose' do
-    # Player loses. WARNING: make sure the game has really been lost!
-    # If they really did lose, show the 'win' view template.
-    # Otherwise, show the main game view instead.
-
-    if @game.check_win_or_lose == :lose
-      erb :lose
-    else
-      redirect '/show'
-    end
+    ### YOUR CODE HERE ###
+    erb :lose # You may change/remove this line
   end
   
 end
